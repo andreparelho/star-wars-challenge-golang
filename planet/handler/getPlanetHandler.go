@@ -9,16 +9,16 @@ import (
 )
 
 func GetPlanetHandler(context *gin.Context) {
-	var GetPlanetRequest = request.GetPlanetRequest{}
+	var getPlanetRequest = request.GetPlanetRequest{}
 
-	if error := context.BindJSON(&GetPlanetRequest); error != nil {
+	if error := context.BindJSON(&getPlanetRequest); error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			"error": "bind json error",
 		})
 		return
 	}
 
-	response := service.GetPlanets(GetPlanetRequest, context)
+	response := service.GetPlanets(getPlanetRequest, context)
 
 	context.JSON(http.StatusOK, response)
 }
