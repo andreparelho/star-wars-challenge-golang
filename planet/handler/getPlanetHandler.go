@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/andreparelho/star-wars-challenge-golang/planet/model/request"
@@ -10,14 +9,16 @@ import (
 )
 
 func GetPlanetHandler(context *gin.Context) {
-	var createPlanetRequest = request.CreatePlanetRequest{}
+	var GetPlanetRequest = request.GetPlanetRequest{}
 
-	if error := context.BindJSON(&createPlanetRequest); error != nil {
-		log.Fatal("bind json error")
+	if error := context.BindJSON(&GetPlanetRequest); error != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{
+			"error": "bind json error",
+		})
 		return
 	}
 
-	response := service.GetPlanets(createPlanetRequest, context)
+	response := service.GetPlanets(GetPlanetRequest, context)
 
 	context.JSON(http.StatusOK, response)
 }
