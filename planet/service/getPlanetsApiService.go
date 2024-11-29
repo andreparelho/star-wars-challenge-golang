@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/andreparelho/star-wars-challenge-golang/planet/common"
 	"github.com/andreparelho/star-wars-challenge-golang/planet/model/request"
 	"github.com/andreparelho/star-wars-challenge-golang/planet/model/response"
 	"github.com/gin-gonic/gin"
 )
 
-const apiUrl = "https://swapi.dev/api/planets/"
-
 func GetPlanets(GetPlanetRequest request.GetPlanetRequest, context *gin.Context) response.HandlerGetPlanetsResponse {
-	requestApi, error := http.Get(apiUrl)
+	requestApi, error := http.Get(common.API_URL)
 	if error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error to call external API",
