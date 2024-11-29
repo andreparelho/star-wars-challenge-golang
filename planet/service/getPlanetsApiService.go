@@ -11,24 +11,44 @@ import (
 
 const apiUrl = "https://swapi.dev/api/planets/"
 
-func GetPlanets(createPlanetRequest request.CreatePlanetRequest, context *gin.Context) response.Data {
-	responseApi, error := http.Get(apiUrl)
+func GetPlanets(GetPlanetRequest request.GetPlanetRequest, context *gin.Context) response.HandlerGetPlanetsResponse {
+	requestApi, error := http.Get(apiUrl)
 	if error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error to call external API",
 		})
-		return response.Data{}
+		return response.HandlerGetPlanetsResponse{}
 	}
 
-	defer responseApi.Body.Close()
+	defer requestApi.Body.Close()
 
 	var getPlanetsResponse = response.Data{}
-	if error := json.NewDecoder(responseApi.Body).Decode(&getPlanetsResponse); error != nil {
+	if error := json.NewDecoder(requestApi.Body).Decode(&getPlanetsResponse); error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Error to processing json",
 		})
-		return response.Data{}
+		return response.HandlerGetPlanetsResponse{}
 	}
 
-	return getPlanetsResponse
+	var planetResponse = checkExistsPlanet(getPlanetsResponse, GetPlanetRequest)
+	if (response.HandlerGetPlanetsResponse{}) == planetResponse {
+		return response.HandlerGetPlanetsResponse{}
+	}
+
+	return planetResponse
+}
+
+func checkExistsPlanet(data response.Data, planetRequest request.GetPlanetRequest) response.HandlerGetPlanetsResponse {
+	for _, planet := range data.Result {
+		if planetRequest.Name == planet.Name {
+			return response.HandlerGetPlanetsResponse{
+				PlanetName: planet.Name,
+				Climate:    planet.Climate,
+				Terrain:    planet.Terrain,
+				Films:      len(planet.Films),
+			}
+		}
+	}
+
+	return response.HandlerGetPlanetsResponse{}
 }
