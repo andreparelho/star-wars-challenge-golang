@@ -18,7 +18,7 @@ type HTTPClient interface {
 
 type RealHTTPClient struct{}
 
-func (c *RealHTTPClient) Get(url string) (*http.Response, error) {
+func (realHttpClient *RealHTTPClient) Get(url string) (*http.Response, error) {
 	return http.Get(url)
 }
 
