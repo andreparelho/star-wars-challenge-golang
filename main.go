@@ -1,18 +1,18 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/andreparelho/star-wars-challenge-golang/planet/handler"
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	fmt.Println("Starting server... ")
+const SERVER_PORT string = ":8080"
+const PLANETS_ENDPOINT string = "/planets"
 
+func main() {
 	router := gin.Default()
 
-	router.GET("/planets", handler.GetPlanetHandler)
+	router.GET(PLANETS_ENDPOINT, handler.GetPlanetHandler)
+	router.POST(PLANETS_ENDPOINT, handler.PostPlanetHandler)
 
-	router.Run(":8080")
+	router.Run(SERVER_PORT)
 }
