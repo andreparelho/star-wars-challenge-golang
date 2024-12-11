@@ -10,16 +10,31 @@ import (
 )
 
 const QUERY_PARAM string = "?page="
+const PAGE string = "page"
 
-func GetAllPlanets(context *gin.Context) response.HandlerGetPlanetsResponse {
-	var page string = context.Query("page")
+type HTTPClient interface {
+	Get(url string) (*http.Response, error)
+}
 
-	requestApi, error := http.Get(common.API_URL + QUERY_PARAM + page)
+type RealHTTPClient struct{}
+
+func (c *RealHTTPClient) Get(url string) (*http.Response, error) {
+	return http.Get(url)
+}
+
+type GetAllPlanetsService struct {
+	Client HTTPClient
+}
+
+func (service *GetAllPlanetsService) GetAllPlanets(context *gin.Context) (response.HandlerGetPlanetsResponse, error) {
+	var page string = context.Query(PAGE)
+
+	requestApi, error := service.Client.Get(common.API_URL + QUERY_PARAM + page)
 	if error != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			common.ERROR_KEY: common.CALL_API_ERROR_MESSAGE,
 		})
-		return response.HandlerGetPlanetsResponse{}
+		return response.HandlerGetPlanetsResponse{}, error
 	}
 
 	defer requestApi.Body.Close()
@@ -30,12 +45,12 @@ func GetAllPlanets(context *gin.Context) response.HandlerGetPlanetsResponse {
 		context.JSON(http.StatusInternalServerError, gin.H{
 			common.ERROR_KEY: common.JSON_PROCESS_ERROR_MESSAGE,
 		})
-		return response.HandlerGetPlanetsResponse{}
+		return response.HandlerGetPlanetsResponse{}, error
 	}
 
 	var responseHandler = response.HandlerGetPlanetsResponse{
 		Planets: getPlanetsResponse.Result,
 	}
 
-	return responseHandler
+	return responseHandler, nil
 }
